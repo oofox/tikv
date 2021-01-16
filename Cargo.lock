@@ -583,6 +583,7 @@ dependencies = [
  "cdc",
  "chrono",
  "clap",
+ "drl",
  "encryption",
  "engine",
  "engine_rocks",
@@ -1045,6 +1046,16 @@ name = "doc-comment"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "923dea538cea0aa3025e8685b20d6ee21ef99c4f77e954a30febbaac5ec73a97"
+
+[[package]]
+name = "drl"
+version = "0.1.0"
+dependencies = [
+ "base64 0.11.0",
+ "futures 0.1.29",
+ "grpcio",
+ "protobuf",
+]
 
 [[package]]
 name = "dtoa"
@@ -4610,6 +4621,7 @@ dependencies = [
  "async-stream",
  "async-trait",
  "backtrace",
+ "base64 0.12.0",
  "batch-system",
  "bitflags",
  "byteorder",

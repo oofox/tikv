@@ -5,6 +5,7 @@ mod cursor;
 mod perf_context;
 mod rocksdb_engine;
 mod stats;
+extern crate base64;
 
 use std::cell::UnsafeCell;
 use std::fmt;
@@ -130,6 +131,7 @@ pub trait Engine: Send + Clone + 'static {
     }
 
     fn put(&self, ctx: &Context, key: Key, value: Value) -> Result<()> {
+        // do put here
         self.put_cf(ctx, CF_DEFAULT, key, value)
     }
 

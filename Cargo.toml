@@ -61,6 +61,7 @@ testexport = ["raftstore/testexport"]
 name = "tikv"
 
 [dependencies]
+base64 = "*"
 async-stream = "0.2"
 async-trait = "0.1"
 backtrace = "0.3"
@@ -198,6 +199,7 @@ members = [
   "components/tikv_alloc",
   "components/match_template",
   "components/codec",
+  "components/drl",
   "components/configuration",
   "components/panic_hook",
   "components/tipb_helper",

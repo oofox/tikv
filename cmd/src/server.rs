@@ -9,6 +9,7 @@
 //! We keep these components in the `TiKVServer` struct.
 
 use crate::{setup::*, signal_handler};
+use drl::DRLClient;
 use encryption::DataKeyManager;
 use engine::rocks;
 use engine_rocks::{
@@ -69,7 +70,6 @@ use tikv_util::{
     time::Monitor,
     worker::{FutureWorker, Worker},
 };
-
 /// Run a TiKV server. Returns when the server is shutdown by the user, in which
 /// case the server will be properly stopped.
 pub fn run_tikv(config: TiKvConfig) {
@@ -101,6 +101,7 @@ pub fn run_tikv(config: TiKvConfig) {
     tikv.register_services();
     tikv.init_metrics_flusher();
     tikv.run_server(server_config);
+    tikv.run_drl();
     tikv.run_status_server();
 
     signal_handler::wait_for_signal(Some(tikv.engines.take().unwrap().engines));
@@ -127,6 +128,7 @@ struct TiKVServer {
     coprocessor_host: Option<CoprocessorHost>,
     to_stop: Vec<Box<dyn Stop>>,
     lock_files: Vec<File>,
+    drl: Arc<DRLClient>,
 }
 
 struct Engines {
@@ -154,7 +156,7 @@ impl TiKVServer {
                 fatal!("failed to create security manager: {}", e.description())
             }));
         let pd_client = Self::connect_to_pd_cluster(&mut config, Arc::clone(&security_mgr));
-
+        let drl = Arc::new(DRLClient::new(config.drl_server.clone()));
         // Initialize and check config
         let cfg_controller = Self::init_config(config);
         let config = cfg_controller.get_current();
@@ -186,6 +188,7 @@ impl TiKVServer {
             coprocessor_host,
             to_stop: vec![Box::new(resolve_worker)],
             lock_files: vec![],
+            drl: drl,
         }
     }
 
@@ -432,7 +435,6 @@ impl TiKVServer {
             tikv::config::Module::Gc,
             Box::new(gc_worker.get_config_manager()),
         );
-
         // Create CoprocessorHost.
         let mut coprocessor_host = self.coprocessor_host.take().unwrap();
 
@@ -777,6 +779,11 @@ impl TiKVServer {
             .server
             .start(server_config, self.security_mgr.clone())
             .unwrap_or_else(|e| fatal!("failed to start server: {}", e));
+    }
+
+    fn run_drl(&mut self) {
+        let drl = self.drl.clone();
+        std::thread::spawn(move || drl.run());
     }
 
     fn run_status_server(&mut self) {

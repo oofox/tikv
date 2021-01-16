@@ -51,6 +51,7 @@ name = "tikv-server"
 name = "tikv-ctl"
 
 [dependencies]
+drl = {path = "../components/drl"}
 backup = { path = "../components/backup", default-features = false }
 cdc = { path = "../components/cdc" }
 chrono = "0.4"

@@ -20,6 +20,8 @@ pub mod txn;
 mod read_pool;
 mod types;
 
+extern crate base64;
+
 pub use self::{
     errors::{get_error_kind_from_header, get_tag_from_header, Error, ErrorHeaderKind, ErrorInner},
     kv::{
@@ -209,7 +211,7 @@ impl<E: Engine, L: LockManager> Storage<E, L> {
         const CMD: &str = "get";
         let priority = ctx.get_priority();
         let priority_tag = get_priority_tag(priority);
-
+        // can do here
         let res = self.read_pool.spawn_handle(
             async move {
                 metrics::tls_collect_command_count(CMD, priority_tag);
@@ -750,7 +752,7 @@ impl<E: Engine, L: LockManager> Storage<E, L> {
         callback: Callback<()>,
     ) -> Result<()> {
         check_key_size!(Some(&key).into_iter(), self.max_key_size, callback);
-
+        // put here
         self.engine.async_write(
             &ctx,
             WriteData::from_modifies(vec![Modify::Put(
@@ -779,7 +781,7 @@ impl<E: Engine, L: LockManager> Storage<E, L> {
             self.max_key_size,
             callback
         );
-
+        // do here
         let modifies = pairs
             .into_iter()
             .map(|(k, v)| Modify::Put(cf, Key::from_encoded(k), v))

@@ -2032,6 +2032,9 @@ pub struct TiKvConfig {
     pub cfg_path: String,
 
     #[config(skip)]
+    pub drl_server: String,
+
+    #[config(skip)]
     #[serde(with = "log_level_serde")]
     pub log_level: slog::Level,
 
@@ -2109,6 +2112,7 @@ pub struct TiKvConfig {
 impl Default for TiKvConfig {
     fn default() -> TiKvConfig {
         TiKvConfig {
+            drl_server: "127.0.0.1:50051".to_owned(),
             cfg_path: "".to_owned(),
             log_level: slog::Level::Info,
             log_file: "".to_owned(),
